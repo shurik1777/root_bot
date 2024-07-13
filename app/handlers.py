@@ -1,7 +1,8 @@
 from aiogram import Router
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
-from aiogram.enums.dice_emoji import DiceEmoji
+from datetime import datetime
+
 
 router = Router()
 
@@ -37,3 +38,19 @@ async def cmd_reply(message: Message):
 @router.message(Command("dice"))
 async def cmd_dice(message: Message):
     await message.answer_dice(emoji="🎲")
+
+
+@router.message(Command("add_to_list"))
+async def cmd_add_to_list(message: Message, mylist: list[int]):
+    mylist.append(7)
+    await message.answer("Добавлено число 7")
+
+
+@router.message(Command("show_list"))
+async def cmd_show_list(message: Message, mylist: list[int]):
+    await message.answer(f"Ваш список: {mylist}")
+
+
+@router.message(Command("info"))
+async def cmd_info(message: Message, started_at: str):
+    await message.answer(f"Бот запущен {started_at}")

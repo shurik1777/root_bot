@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime
 
 from aiogram import Dispatcher
 
@@ -11,7 +12,8 @@ from config_reader import bot
 async def main():
     dp = Dispatcher()
     dp.include_router(router)
-    await dp.start_polling(bot)
+    dp["started_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    await dp.start_polling(bot, mylist=[1, 2, 3])
 
 
 if __name__ == '__main__':
