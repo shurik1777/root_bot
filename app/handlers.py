@@ -1,8 +1,7 @@
-from datetime import datetime
-
+import re
 from aiogram import Router, F, html
-from aiogram.filters import CommandStart, Command
-from aiogram.types import Message
+from aiogram.filters import CommandStart, Command, CommandObject
+from aiogram.types import Message, LinkPreviewOptions
 from aiogram.enums import ParseMode
 from aiogram.utils.formatting import (
     Bold, as_list, as_marked_section, as_key_value, HashTag, Text
@@ -11,9 +10,9 @@ from aiogram.utils.formatting import (
 router = Router()
 
 
-@router.message(CommandStart())
-async def cmd_start(message: Message):
-    await message.answer(f'Hello {message.from_user.first_name}')
+# @router.message(CommandStart())
+# async def cmd_start(message: Message):
+#     await message.answer(f'Hello {message.from_user.first_name}')
 
 
 # Хэндлер на команду /test1 подключаем через декоратор
@@ -135,11 +134,159 @@ async def cmd_advanced_example(message: Message):
     await message.answer(**content.as_kwargs())
 
 
-@router.message(F.text)
-async def echo_with_time(message: Message):
-    # Получаем текущее время в часовом поясе ПК
-    time_now = datetime.now().strftime('%H:%M')
-    # Создаём подчёркнутый текст
-    added_text = html.underline(f"Создано в {time_now}")
-    # Отправляем новое сообщение с добавленным текстом
-    await message.answer(f"{message.html_text}\n\n{added_text}", parse_mode="HTML")
+# @router.message(F.text)
+# async def echo_with_time(message: Message):
+#     # Получаем текущее время в часовом поясе ПК
+#     time_now = datetime.now().strftime('%H:%M')
+#     # Создаём подчёркнутый текст
+#     added_text = html.underline(f"Создано в {time_now}")
+#     # Отправляем новое сообщение с добавленным текстом
+#     await message.answer(f"{message.html_text}\n\n{added_text}", parse_mode="HTML")
+
+
+@router.message(Command("settimer"))
+async def cmd_settimer(
+        message: Message,
+        command: CommandObject
+):
+    # Если не переданы никакие аргументы, то
+    # command.args будет None
+    if command.args is None:
+        await message.answer(
+            "Ошибка: не переданы аргументы"
+        )
+        return
+    # Пробуем разделить аргументы на две части по первому встречному пробелу
+    try:
+        delay_time, text_to_send = command.args.split(" ", maxsplit=1)
+    # Если получилось меньше двух частей, вылетит ValueError
+    except ValueError:
+        await message.answer(
+            "Ошибка: неправильный формат команды. Пример:\n"
+            "/settimer <time> <message>"
+        )
+        return
+    await message.answer(
+        "Таймер добавлен!\n"
+        f"Время: {delay_time}\n"
+        f"Текст: {text_to_send}"
+    )
+
+
+@router.message(Command("custom1", prefix="%"))
+async def cmd_custom1(message: Message):
+    await message.answer("Вижу команду!")
+
+
+# Можно указать несколько префиксов....vv...
+@router.message(Command("custom2", prefix="/!"))
+async def cmd_custom2(message: Message):
+    await message.answer("И эту тоже вижу!")
+
+
+# @router.message(F.text)
+# async def extract_data(message: Message):
+#     data = {
+#         "url": "<N/A>",
+#         "email": "<N/A>",
+#         "code": "<N/A>"
+#     }
+#     entities = message.entities or []
+#     for item in entities:
+#         if item.type in data.keys():
+#             # Неправильно
+#             # data[item.type] = message.text[item.offset : item.offset+item.length]
+#             # Правильно
+#             data[item.type] = item.extract_from(message.text)
+#     await message.reply(
+#         "Вот что я нашёл:\n"
+#         f"URL: {html.quote(data['url'])}\n"
+#         f"E-mail: {html.quote(data['email'])}\n"
+#         f"Пароль: {html.quote(data['code'])}"
+#     )
+
+
+@router.message(Command("help"))
+@router.message(CommandStart(
+    deep_link=True, magic=F.args == "help"
+))
+async def cmd_start_help(message: Message):
+    await message.answer("Это сообщение со справкой")
+
+
+@router.message(CommandStart(
+    deep_link=True,
+    magic=F.args.regexp(re.compile(r'book_(\d+)'))
+))
+# https://t.me/yyyee2e_bot?start=book_255
+async def cmd_start_book(
+        message: Message,
+        command: CommandObject
+):
+    book_number = command.args.split("_")[1]
+    await message.answer(f"Sending book №{book_number}")
+
+
+@router.message(Command("links"))
+async def cmd_links(message: Message):
+    links_text = (
+        "https://nplus1.ru/news/2024/05/23/voyager-1-science-data"
+        "\n"
+        "https://t.me/telegram"
+    )
+    # Ссылка отключена
+    options_1 = LinkPreviewOptions(is_disabled=True)
+    await message.answer(
+        f"Нет превью ссылок\n{links_text}",
+        link_preview_options=options_1
+    )
+
+    # -------------------- #
+
+    # Маленькое превью
+    # Для использования prefer_small_media обязательно указывать ещё и url
+    options_2 = LinkPreviewOptions(
+        url="https://nplus1.ru/news/2024/05/23/voyager-1-science-data",
+        prefer_small_media=True
+    )
+    await message.answer(
+        f"Маленькое превью\n{links_text}",
+        link_preview_options=options_2
+    )
+
+    # -------------------- #
+
+    # Большое превью
+    # Для использования prefer_large_media обязательно указывать ещё и url
+    options_3 = LinkPreviewOptions(
+        url="https://nplus1.ru/news/2024/05/23/voyager-1-science-data",
+        prefer_large_media=True
+    )
+    await message.answer(
+        f"Большое превью\n{links_text}",
+        link_preview_options=options_3
+    )
+
+    # -------------------- #
+
+    # Можно сочетать: маленькое превью и расположение над текстом
+    options_4 = LinkPreviewOptions(
+        url="https://nplus1.ru/news/2024/05/23/voyager-1-science-data",
+        prefer_small_media=True,
+        show_above_text=True
+    )
+    await message.answer(
+        f"Маленькое превью над текстом\n{links_text}",
+        link_preview_options=options_4
+    )
+
+    # -------------------- #
+
+    # Можно выбрать, какая ссылка будет использоваться для предпосмотра,
+    options_5 = LinkPreviewOptions(
+        url="https://t.me/telegram"
+    )
+    await message.answer(
+        f"Предпросмотр не первой ссылки\n{links_text}",
+        link_preview_options=options_5
+    )
