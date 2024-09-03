@@ -3,6 +3,7 @@ from aiogram import Router, F, html
 from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import Message, LinkPreviewOptions
 from aiogram.enums import ParseMode
+from aiogram.utils.markdown import hide_link
 from aiogram.utils.formatting import (
     Bold, as_list, as_marked_section, as_key_value, HashTag, Text
 )
@@ -289,4 +290,15 @@ async def cmd_links(message: Message):
     await message.answer(
         f"Предпросмотр не первой ссылки\n{links_text}",
         link_preview_options=options_5
+    )
+
+
+
+@router.message(Command("hidden_link"))
+async def cmd_hidden_link(message: Message):
+    await message.answer(
+        f"{hide_link('https://telegra.ph/file/562a512448876923e28c3.png')}"
+        f"Документация Telegram: *существует*\n"
+        f"Пользователи: *не читают документацию*\n"
+        f"Груша:"
     )
