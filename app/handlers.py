@@ -293,7 +293,6 @@ async def cmd_links(message: Message):
     )
 
 
-
 @router.message(Command("hidden_link"))
 async def cmd_hidden_link(message: Message):
     await message.answer(

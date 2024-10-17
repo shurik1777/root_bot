@@ -1,3 +1,4 @@
+"""Точка входа и запуска, так же подключения обработчика событий и пр."""
 import asyncio
 import logging
 from datetime import datetime
@@ -11,6 +12,9 @@ from config_reader import bot
 
 
 async def main():
+    """
+Функция подключения через Диспетчер обработчиков событий и пр.
+    """
     dp = Dispatcher()
     dp.include_router(router)
     dp.include_router(files)

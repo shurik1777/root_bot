@@ -1,3 +1,4 @@
+"""Работа с фото и стикерами"""
 from aiogram import Router, F
 from aiogram.types import Message
 from config_reader import bot
@@ -7,6 +8,10 @@ files_d = Router()
 
 @files_d.message(F.photo)
 async def download_photo(message: Message):
+    """
+
+    :param message:
+    """
     await bot.download(
         message.photo[-1],
         destination=f"D:\\Ucheba\\TG_BOTS\\test_bot\\app\\{message.photo[-1].file_id}.jpg"
