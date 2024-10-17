@@ -8,6 +8,7 @@ from aiogram import Dispatcher
 from app.d_files import files_d
 from app.h_files import files
 from app.handlers import router
+from app.handlers_kb_sp import kbd
 from config_reader import bot
 
 
@@ -19,6 +20,7 @@ async def main():
     dp.include_router(router)
     dp.include_router(files)
     dp.include_router(files_d)
+    dp.include_router(kbd)
     dp["started_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
     await dp.start_polling(bot, mylist=[1, 2, 3])
 
