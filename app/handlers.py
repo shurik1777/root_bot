@@ -19,11 +19,13 @@ router = Router()
 # Хэндлер на команду /test1 подключаем через декоратор
 @router.message(Command("test1"))
 async def cmd_test1(message: Message):
+    """Первые тестовые"""
     await message.reply("Test 1")
 
 
-# Хэндлер на команду /test2 подключаем через точечную аннатацию
+# Хэндлер на команду /test2 подключаем через точечную аннотацию
 async def cmd_test2(message: Message):
+    """Вторые тестовые"""
     await message.reply("Test 2")
 
 
@@ -32,32 +34,38 @@ router.message.register(cmd_test2, Command("test2"))
 
 @router.message(Command("answer"))
 async def cmd_answer(message: Message):
+    """Ответ простой"""
     await message.answer("Это простой ответ")
 
 
 @router.message(Command("reply"))
 async def cmd_reply(message: Message):
+    """Ответ с цитируемым ответом на этот же ответ"""
     await message.reply('Это ответ с "ответом"')
 
 
 @router.message(Command("dice"))
 async def cmd_dice(message: Message):
+    """Ответ эмодзей"""
     await message.answer_dice(emoji="🎲")
 
 
 @router.message(Command("add_to_list"))
 async def cmd_add_to_list(message: Message, mylist: list[int]):
+    """Генерация списка и добавления в него цифры семь"""
     mylist.append(7)
     await message.answer("Добавлено число 7")
 
 
 @router.message(Command("show_list"))
 async def cmd_show_list(message: Message, mylist: list[int]):
+    """Показ списка"""
     await message.answer(f"Ваш список: {mylist}")
 
 
 @router.message(Command("info"))
 async def cmd_info(message: Message, started_at: str):
+    """Команда отдающая время запуска бота"""
     await message.answer(f"Бот запущен {started_at}")
 
 
@@ -65,6 +73,7 @@ async def cmd_info(message: Message, started_at: str):
 # то хэндлер сработает даже на картинку с подписью /test
 @router.message(F.text, Command("test"))
 async def any_message(message: Message):
+    """Фильтр запроса + редакция на вывод через HTML и Маркадван"""
     await message.answer(
         "Hello, <b>world</b>!",
         parse_mode=ParseMode.HTML
@@ -84,7 +93,7 @@ async def any_message(message: Message):
 
 @router.message(Command("hello"))
 async def cmd_hello(message: Message):
-    """Не будет работать с ников м тегах"""
+    """Не будет корректного вывода ников с тегами в них"""
     await message.answer(
         f"Hello, <b>{message.from_user.full_name}</b>",
         parse_mode=ParseMode.HTML
@@ -97,7 +106,7 @@ async def cmd_hello(message: Message):
     воспользоваться специальным инструментом,
     который будет собирать отдельно текст и отдельно
     информацию о том, какие его куски должны быть
-    отформатированы."""
+    отформатированы. """
     content = Text(
         "Hello, ",
         Bold(message.from_user.full_name)
@@ -109,6 +118,7 @@ async def cmd_hello(message: Message):
 
 @router.message(Command("advanced_example"))
 async def cmd_advanced_example(message: Message):
+    """Создания листов с форматированием"""
     content = as_list(
         as_marked_section(
             Bold("Success:"),
@@ -133,6 +143,8 @@ async def cmd_advanced_example(message: Message):
         sep="\n\n",
     )
     await message.answer(**content.as_kwargs())
+    # ** используются для распаковки словаря в аргументы функции.
+    # Это позволяет передать параметры в метод answer в виде именованных аргументов.
 
 
 # @router.message(F.text)
@@ -150,6 +162,7 @@ async def cmd_settimer(
         message: Message,
         command: CommandObject
 ):
+    """Функция предназначена для обработки команды установки таймера"""
     # Если не переданы никакие аргументы, то
     # command.args будет None
     if command.args is None:
@@ -176,12 +189,14 @@ async def cmd_settimer(
 
 @router.message(Command("custom1", prefix="%"))
 async def cmd_custom1(message: Message):
+    """Использование префиксов"""
     await message.answer("Вижу команду!")
 
 
 # Можно указать несколько префиксов....vv...
 @router.message(Command("custom2", prefix="/!"))
 async def cmd_custom2(message: Message):
+    """Использование нескольких префиксов"""
     await message.answer("И эту тоже вижу!")
 
 
@@ -212,6 +227,7 @@ async def cmd_custom2(message: Message):
     deep_link=True, magic=F.args == "help"
 ))
 async def cmd_start_help(message: Message):
+    """Использование deep_link"""
     await message.answer("Это сообщение со справкой")
 
 
@@ -224,12 +240,14 @@ async def cmd_start_book(
         message: Message,
         command: CommandObject
 ):
+    """Работа с регулярными выражениями через deep_link"""
     book_number = command.args.split("_")[1]
     await message.answer(f"Sending book №{book_number}")
 
 
 @router.message(Command("links"))
 async def cmd_links(message: Message):
+    """Работа со ссылками"""
     links_text = (
         "https://nplus1.ru/news/2024/05/23/voyager-1-science-data"
         "\n"
@@ -295,6 +313,7 @@ async def cmd_links(message: Message):
 
 @router.message(Command("hidden_link"))
 async def cmd_hidden_link(message: Message):
+    """Работа со ссылками которые спрятаны"""
     await message.answer(
         f"{hide_link('https://telegra.ph/file/562a512448876923e28c3.png')}"
         f"Документация Telegram: *существует*\n"
