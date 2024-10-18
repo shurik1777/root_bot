@@ -1,14 +1,16 @@
 """То, что я называю переработанным кодом с самого начала"""
 from aiogram import Router  # Импорт роутера для начала работы с файлом обработчиком событий
-from aiogram.filters import Command  # Фильтры
-from aiogram.types import Message, KeyboardButton  # Типы
+from aiogram.filters import CommandStart, Command  # Фильтры
+from aiogram.types import Message, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, Update, \
+    CallbackQuery  # Типы
 
-from utils.kb import create_keyboard  # Импорт отдельно взятой функции для подключения одинаковых логик
+from utils.kb import create_keyboard, \
+    create_keyboard_in  # Импорт отдельно взятой функции для подключения одинаковых логик
 
 kbd = Router()
 
 
-@kbd.message(Command("start"))
+@kbd.message(CommandStart())
 async def cmd_start_too(message: Message):
     """
     3 Кнопки при отлове события /start
@@ -39,6 +41,8 @@ async def cmd_start(message: Message):
     ])
     await message.answer("Привет, ты кто?", reply_markup=keyboard)
     '''
+
+
 """
 - Создание функции для создания клавиатуры: Если вам понадобится создать подобные клавиатуры в разных местах кода,
  можно создать вспомогательную функцию, чтобы избежать дублирования.
@@ -58,3 +62,22 @@ async def cmd_start(message: Message):
     await message.answer("Привет, ты кто?", reply_markup=keyboard)
 """
 
+
+@kbd.message(Command("go"))
+async def push_me(message: Message):
+    """ Функция для начала взаимодействия """
+    buttons = [
+        InlineKeyboardButton(text="Нажми меня!",
+                             callback_data="button_pressed")
+    ]
+    keyboard = create_keyboard_in(buttons)
+    await message.answer('Привет! Нажми на кнопку ниже:',
+                         reply_markup=keyboard)
+
+
+@kbd.callback_query(lambda c: c.data == 'button_pressed')
+async def button_push(callback: CallbackQuery):
+    """ Отвечаем на нажатие кнопки """
+    await callback.message.edit_text(
+        text="Ты нажал кнопку!")
+    await callback.answer()
