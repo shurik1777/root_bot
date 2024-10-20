@@ -1,5 +1,6 @@
+"""Work with all files"""
 from aiogram import Router, F
-from aiogram.types import Message, FSInputFile, URLInputFile, BufferedInputFile
+from aiogram.types import Message, FSInputFile, URLInputFile  # , BufferedInputFile
 from aiogram.filters import Command
 files = Router()
 
@@ -12,6 +13,7 @@ async def echo_gif(message: Message):
 
 @files.message(Command('images'))
 async def upload_photo(message: Message):
+    """Echo image message"""
     # Сюда будем помещать file_id отправленных файлов, чтобы потом ими воспользоваться
     file_ids = []
     """В photo_id у нас присваивается массив идентификаторов, но нам не нужно маленькое изображение,
@@ -19,7 +21,7 @@ async def upload_photo(message: Message):
     мы ставим там "[3]" чтобы взять его из этого массива,
     точно не помню, но значит он находится на 4 позиции,
     Т. к. Массивы с 0. Если короче, то у Аргумента photo мы берём только 4-ый file_id
-    или как тут у груши result.photo[-1] - срезом"""
+    или как тут у груши result.photo[-1] - срезом последний"""
 
     # Чтобы продемонстрировать BufferedInputFile, воспользуемся "классическим"
     # открытием файла через `open()`. Но, вообще говоря, этот способ
@@ -63,6 +65,7 @@ async def upload_photo(message: Message):
 
 @files.message(Command("gif"))
 async def send_gif(message: Message):
+    """Echo gif message"""
     await message.answer_animation(
         animation="AgACAgIAAxkDAAM6ZpN1XHLKzir-cAEeITwkl-XyI8UAAl3gMRu69ZhIdOF8ah3R23sBAAMCAANtAAM1BA",
         caption="Я сегодня:",

@@ -1,5 +1,6 @@
+"""Test Handlers"""
 import re
-from aiogram import Router, F, html
+from aiogram import Router, F  # , html
 from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import Message, LinkPreviewOptions
 from aiogram.enums import ParseMode
@@ -78,10 +79,9 @@ async def any_message(message: Message):
         "Hello, <b>world</b>!",
         parse_mode=ParseMode.HTML
     )
-    await message.answer(
-        "Hello, *world*\!",
-        parse_mode=ParseMode.MARKDOWN_V2
-    )
+    await message.answer("Hello, *world*\\!",
+                         parse_mode=ParseMode.MARKDOWN_V2
+                         )
     await message.answer("Сообщение с <u>HTML-разметкой</u>")
     # чтобы явно отключить форматирование в конкретном запросе,
     # передайте parse_mode=None
